@@ -1,0 +1,56 @@
+-- Tencent is pleased to support the open source community by making xLua available.
+-- Copyright (C) 2016 THL A29 Limited, a Tencent company. All rights reserved.
+-- Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+-- http://opensource.org/licenses/MIT
+-- Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+function start()
+	print("lua start...")
+	local vlua = require('vlua_xlua')
+
+	local btnAddText = btnAddText:GetComponent("Button")
+	local btnReset = btnReset:GetComponent("Button")
+	local inputFirstName = inputFirstName:GetComponent("InputField")
+	local inputLastName = inputLastName:GetComponent("InputField")
+	local txtName1 = txtName1:GetComponent("Text")
+	local txtName2 = txtName2:GetComponent("Text")
+	local txtName3 = txtName3:GetComponent("Text")
+
+	-- 开启一个可响应式函数实例
+    vlua.new(function()
+		-- 创建可响应的数据
+		local data = vlua.reactive({
+			firstName = 'li',
+			lastName = 'jinjun',
+			-- 简化的computed函数
+			fullName = function(self)
+				return self.firstName .. ' ' .. self.lastName
+			end
+		})
+
+		-- 创建一个绑定器，绑定器指向data数据源
+		local binder = vlua.createBinder(data)
+		-- 通过指定字段名绑定Text与data.firstName
+		binder:bindText(txtName1, 'firstName')
+		-- 通过函数返回绑定Text与data.lastName
+		binder:bindText(txtName2, function()return data.lastName end)
+		-- 绑定computed函数
+		binder:bindText(txtName3, 'fullName')
+
+		-- 双向绑定
+		binder:bindInputField(inputFirstName, 'firstName')
+		binder:bindInputField(inputLastName, 'lastName')
+
+		-- 绑定按钮事件
+		binder:bindUIEvent(btnAddText.onClick, function()
+			-- 动态修改数据，自动触发数据修改
+			data.lastName = data.lastName .. '.'
+		end)
+
+		-- 绑定按钮事件
+		binder:bindUIEvent(btnReset.onClick, function()
+			-- 动态修改数据，自动触发数据修改
+			data.lastName = 'noname'
+		end)
+    end)
+end
