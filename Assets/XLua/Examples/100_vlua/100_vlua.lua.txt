@@ -17,7 +17,7 @@ function start()
 	local txtName3 = txtName3:GetComponent("Text")
 
 	-- 开启一个可响应式函数实例
-    vlua.new(function()
+    vlua.new(function(binder)
 		-- 创建可响应的数据
 		local data = vlua.reactive({
 			firstName = 'li',
@@ -29,7 +29,7 @@ function start()
 		})
 
 		-- 创建一个绑定器，绑定器指向data数据源
-		local binder = vlua.createBinder(data)
+		local binder = binder:createChild(data)
 		-- 通过指定字段名绑定Text与data.firstName
 		binder:bindText(txtName1, 'firstName')
 		-- 通过函数返回绑定Text与data.lastName
